@@ -43,8 +43,9 @@ Two degenerate histories get their own handling. When the page has never
 refreshed (every read identical: launch night, before Exophase's first
 refresh of the game) and the horizon is short, the next refresh is overdue
 and dilutes every rate: the tracked count jumps while the new players hold
-far fewer trophies, so the median is divided by a dilution factor and the
-spread widened. A trophy already at 100% is exempt: every tracked player
+far fewer trophies, so the median is divided by a dilution factor of 6
+(the first refresh took tracked players 638 -> 3,868) and the spread is
+the 0.4 floor. A trophy already at 100% is exempt: every tracked player
 holds it, and the first refresh left it at 100%. When a trophy has no usable
 fit at all, the forecast falls back to persistence with a wide spread.
 
@@ -116,11 +117,20 @@ SPREAD_SCALE = 0.75
 # story chapters in order, 100% completion lowest).
 APPLY_STRUCTURE = True
 # Stale-page dilution: when no refresh has ever been seen and the horizon
-# is short, the median rate is divided by this (launch night's first
-# refresh multiplied the tracked count about sixfold while earners for
-# most trophies barely moved).
-STALE_DILUTION = 4.5
-STALE_SPREAD = 1.7
+# is short, the median rate is divided by this. Round 1 used 4.5; the
+# server's round-1 practice numbers (loss 0.37829, typical miss 0.05pp)
+# pin the truth much closer to earners-unchanged: the first refresh took
+# tracked players 638 -> 3,868 (a 6.06x dilution) while only ~103 new
+# earners spread diffusely over the other 54 trophies, so the median is
+# the last rate divided by ~6, not 4.5. A lumpier truth is ruled out by
+# those same numbers (it would have given loss ~0.41, miss ~0.09pp).
+STALE_DILUTION = 6.0
+# The stale spread was 1.7; that width alone was ~90% of round 1's practice
+# loss (pinball loss of a centred forecast is ~0.2 * spread). The truth
+# sits within ~0.05pp of the diluted median, so the spread is the 0.4
+# floor every fallback already uses; anything below 0.4 is a no-op
+# against that floor, and 0.5 scores worse on every candidate truth.
+STALE_SPREAD = 0.4
 STALE_HORIZON_HOURS = 24.0
 
 
